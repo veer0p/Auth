@@ -6,7 +6,9 @@ services:
     region: oregon
     branch: main
     rootDir: Backend
-    buildCommand: "npm install && npm run build"
+  # Ensure devDependencies (TypeScript) are installed for the build step
+  # Use `npm ci` for reproducible install and include dev deps
+  buildCommand: "npm ci --include=dev && npm run build"
     startCommand: "npm start"
     healthCheckPath: /health
     autoDeploy: true
