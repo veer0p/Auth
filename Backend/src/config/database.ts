@@ -3,27 +3,16 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Validate required environment variables
-const requiredEnvVars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
-const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
-
-if (missingEnvVars.length > 0) {
+// Check for database URL
+if (!process.env.DATABASE_URL) {
   throw new Error(
-    `Missing required environment variables: ${missingEnvVars.join(', ')}\n` +
-    `Please ensure these are set in your .env file.`
+    'Missing required environment variable: DATABASE_URL\n' +
+    'Please ensure this is set in your .env file.'
   );
 }
 
-const dbHost = process.env.DB_HOST!;
-const dbPort = parseInt(process.env.DB_PORT!, 10);
-const dbName = process.env.DB_NAME!;
-const dbUser = process.env.DB_USER!;
-const dbPassword = process.env.DB_PASSWORD!;
-
-// Create Sequelize instance
-export const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
-  host: dbHost,
-  port: dbPort,
+// Create Sequelize instance using connection URI
+export const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   dialectOptions: {
