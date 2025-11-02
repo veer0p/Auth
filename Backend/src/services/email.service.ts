@@ -18,6 +18,8 @@ class EmailService {
     const emailProvider = process.env.EMAIL_PROVIDER || 'smtp'; // smtp, gmail, sendgrid, etc.
 
     if (emailProvider === 'gmail') {
+      // NOTE: Using 'gmail' requires a Gmail App Password and is often blocked
+      // on cloud platforms even with 587. Using a transactional service (SMTP) is highly recommended.
       this.transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -26,11 +28,17 @@ class EmailService {
         },
       });
     } else {
-      // Generic SMTP (works with most email providers)
+      // Generic SMTP (works with most email providers like SendGrid, Mailgun)
       this.transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '587', 10),
-        secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+        host: process.env.SMTP_HOST || 'smtp.example.com', // Replace default with a placeholder or set via ENV
+        
+        // *** CRITICAL FIX FOR CLOUD DEPLOYMENTS ***
+        // Port 587 is often blocked by providers like Render/Hostinger. 
+        // 2525 is a common alternative port that is usually open.
+        port: parseInt(process.env.SMTP_PORT || '2525', 10),
+
+        // secure: true for port 465 (which is often blocked), secure: false for ports 587 and 2525
+        secure: process.env.SMTP_SECURE === 'true', 
         auth: {
           user: process.env.EMAIL_USER || process.env.SMTP_USER,
           pass: process.env.EMAIL_PASSWORD || process.env.SMTP_PASSWORD,
@@ -218,5 +226,3 @@ class EmailService {
 // Export singleton instance
 export const emailService = new EmailService();
 export default emailService;
-
-
