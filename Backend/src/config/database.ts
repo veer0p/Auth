@@ -19,6 +19,9 @@ export const sequelize = new Sequelize(process.env.DATABASE_URL, {
     ssl: {
       require: true,
       rejectUnauthorized: false // Required for Supabase
+    },
+    host: {
+      family: 4
     }
   },
   pool: {
